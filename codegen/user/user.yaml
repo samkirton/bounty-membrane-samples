@@ -1,0 +1,101 @@
+configuration:
+    name: membrane-user
+    package: com.memtrip.membrane.user
+    version: 1.0
+
+    android:
+        versioncode: 1
+        minsdkversion: 15
+        targetsdkversion: 23
+        buildtoolsversion: 23.0.2
+
+    vertx:
+        version: 3.2.0
+
+data:
+    enum:
+    - name: State
+      val:
+      - name: NOT_REGISTERED
+      - name: ACTIVE
+      - name: DELETED
+
+    - name: Platform
+      val: 
+      - name: ANDROID
+      - name: IOS
+
+    bean:
+    - name: User
+      var:
+      - name: userId
+        type: $string
+
+      - name: username
+        type: $string
+
+      - name: state
+        type: ^State
+
+      - name: platform
+        type: ^Platform
+
+      - name: dateCreatedTimestamp
+        type: $long
+
+      - name: lastLoginTimestamp
+        type: $long
+
+    - name: Preferences
+      var:
+      - name: gcmId
+        type: $string
+      - name: pushPerHour
+        type: $integer
+
+endpoint:
+    resource:
+    - path: /user/auth/
+      id: UserAuth
+      method:
+      - name: POST
+        id: login
+        request:
+            header:
+            - name: X-Version
+
+            query:
+            - name: facebookToken
+              type: $string
+
+        response:
+            header:
+            - name: X-Access-Token
+            code: 200
+            body:
+                type: ~User
+
+    - path: /user/{userId}
+      id: User
+      method:
+      - name: POST
+        id: createUser
+        request:
+            header:
+            - name: X-Version
+            - name: X-Access-Token
+            body:
+              type: ~User
+        response:
+            code: 201
+            body:
+              type: ~User
+
+      - name: DELETE
+        id: deleteUser
+        request:
+            header:
+            - name: X-Version
+            - name: X-Access-Token
+        response:
+            code: 204

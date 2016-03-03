@@ -1,0 +1,157 @@
+configuration:
+    name: membrane-cell
+    package: com.memtrip.membrane.cell
+    version: 1.0
+
+    android:
+      versioncode: 1
+      minsdkversion: 15
+      targetsdkversion: 23
+      buildtoolsversion: 23.0.2
+
+    vertx:
+      version: 3.2.0
+
+data:
+    enum:
+    - name: Action
+      val:
+      - name: KEEP
+      - name: DISCARD
+
+    - name: State
+      - name: ACTIVE
+      - name: INACTIVE
+
+    bean:
+    - name: Membrane
+      var:
+      - name: membraneId
+        type: $string
+
+      - name: title
+        type: $string
+
+      - name: cells
+        type: ~Cell[]
+
+    - name: Cell
+      var:
+      - name: cellId
+        type: $string
+
+      - name: body
+        type: $string
+
+      - name: createdTimestamp
+        type: $long
+
+      - name: action
+        type: ^Action
+
+      - name: state
+        type: ^State
+
+    - name: CellList
+      var:
+      - name: cells
+        type: ~Cell[]
+
+endpoint:
+    resource:
+    - path: /membrane/{membraneId}
+      id: Membrane
+      method:
+      - name: GET
+        id: getMembrane
+        request:
+          header:
+          - name: X-Version
+          - name: X-Access-Token
+
+          path:
+          - name: id
+            type: $string
+
+        response:
+          code: 200
+          body:
+            type: ~Membrane
+
+    - path: /membrane/{membraneId}/cell/
+      id: Cell
+      method:
+      - name: GET
+        id: getCells
+        request:
+          header:
+          - name: X-Version
+          - name: X-Access-Token
+
+          query:
+            - name: skip
+              type: $integer
+            - name: limit
+              type: $integer
+
+          path: 
+            - name: membraneId
+              type: $string
+
+        response:
+          code: 200
+          body:
+            type: ~CellList
+
+    - path: /membrane/{membraneId}/cell/{cellId}
+      id: Cell
+      - name: POST
+        id: createCell
+        request:
+          header:
+          - name: X-Version
+          - name: X-Access-Token
+
+          path: 
+            - name: membraneId
+              type: $string
+            - name: cellId
+              type: $string
+
+          body:
+            type: ~Cell
+
+        response:
+          code: 201
+
+      - name: PUT
+        id: keepCell
+        request:
+          header:
+          - name: X-Version
+          - name: X-Access-Token
+
+          path: 
+            - name: membraneId
+              type: $string
+            - name: cellId
+              type: $string
+
+        response:
+          code: 204
+
+      - name: DELETE
+        id: deleteCell
+        request:
+          header:
+          - name: X-Version
+          - name: X-Access-Token
+
+          path: 
+            - name: membraneId
+              type: $string
+            - name: cellId
+              type: $string
+
+        response:
+          code: 204
